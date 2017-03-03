@@ -1,0 +1,6 @@
+....-..-16 +10 Paycheck
+....-..-la +10 Paycheck
+# abc
+....-..-06 -5 Rent
+....-..-01 -1 Utilities
+....-07-05 -1 Car Insurance

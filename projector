@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import re
+import datetime
+import calendar
+import locale
+from datetime import timedelta
+
+def nvl(string):
+    if len(string) == 0 or string.startswith("#"):
+        return "xxxx-xx-xx -0 dummy"
+    return string
+
+def daterange(start_date, end_date):
+    for n in range(int ((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
+def calculate_income(date_string):
+    total = 0
+    for data_row in data_table:
+        regex = data_row[0]
+        if regex == "....-..-la":
+            last_day_of_month = calendar.monthrange(date.year, date.month)[1]
+            regex = "....-..-" + str(last_day_of_month)
+        amount = data_row[1]
+        pattern = re.compile(regex)
+        if pattern.match(date_string):
+            total += int(amount)
+    return total
+
+def calculate_balance(date_string):
+    global balance
+    new_balance = balance + calculate_income(date_string)
+    if new_balance != balance:
+        formatted_balance = str(locale.currency(new_balance, grouping=True))[:-3]
+        print(date_string + "\t" + formatted_balance)
+    balance = new_balance
+
+start_date = datetime.datetime.now()
+end_date = start_date + timedelta(days=365)
+balance = 0
+data_table = []
+
+with open("projector.txt") as f:
+    data_table = [[line_item for line_item in nvl(line).split(" ")] for line in f.read().splitlines()]
+
+locale.setlocale( locale.LC_ALL, "" )
+
+for date in daterange(start_date, end_date):
+    date_string = date.strftime("%Y-%m-%d")
+    calculate_balance(date_string)
